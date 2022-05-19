@@ -75,7 +75,7 @@ class TestPumf(tests.UMUtilsNDTest):
                 buffer_lines = strbuffer.getvalue().split("\n")
                 expect_lines = fh.read().split("\n")
                 for iline, line in enumerate(buffer_lines):
-                    self.assertLinesEqual(line, expect_lines[iline])
+                    self.assertLinesEquiv(line, expect_lines[iline])
         else:
             # If the file doesn't exist, either try to create it (if the
             # manual flag is set in this file, otherwise it is an error)

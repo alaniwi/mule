@@ -23,6 +23,9 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os
+import re
+from math import log10, floor
+
 import numpy as np
 import unittest as tests
 
@@ -49,11 +52,27 @@ class _UMUtilsTest(tests.TestCase):
         """Check that numpy array is less than value."""
         np.testing.assert_array_less(a, b, err_msg=err_msg)
 
+
     def assertLinesEqual(self, line1, line2):
         """Check two output lines are equal."""
         self.assertEqual(line1, line2, "Lines not equal:\nFound:\n  "
                          "'{0}'\nExpected:\n  '{1}'".format(line1, line2))
 
+    def _round_to_n(self, x, sf):
+        "round to specified number of significant figures"
+        return round(x, -int(floor(log10(x))) + (sf - 1))
+
+    def assertLinesEquiv(self, line1, line2, float_digits=10):
+        """Check two output lines are equivalent, rounding any 
+        floating point numbers before comparing.
+        """
+        func = lambda match: str(self._round_to_n(float(match.group()), float_digits))
+        pat = "\w-?\d+\.\d*\w"
+        line1 = re.sub(pat, func, line1)
+        line2 = re.sub(pat, func, line2)
+        self.assertEqual(line1, line2, "Lines not equivalent:\nFound:\n  "
+                         "'{0}'\nExpected:\n  '{1}'".format(line1, line2))
+            
     @staticmethod
     def _minimal_valid_ff(num_cols, num_rows, num_levels,
                           start_lon, start_lat, col_spacing, row_spacing,
